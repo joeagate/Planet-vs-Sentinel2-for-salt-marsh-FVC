@@ -1,0 +1,2 @@
+,MAE,RMSE,R2,satellite,cover,sample,bands,onehot,dataset
+0,0.1742054063836237,0.2148879857094486,0.5326707004710639,Planet,high,100,CommonBands,notonehot,test

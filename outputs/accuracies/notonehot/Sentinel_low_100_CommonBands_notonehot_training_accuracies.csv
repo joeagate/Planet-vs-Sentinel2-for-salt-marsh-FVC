@@ -1,0 +1,2 @@
+,MAE,RMSE,R2,satellite,cover,sample,bands,onehot,dataset
+0,0.043189897909836975,0.056980915179464645,0.9626451143970282,Sentinel,low,100,CommonBands,notonehot,train

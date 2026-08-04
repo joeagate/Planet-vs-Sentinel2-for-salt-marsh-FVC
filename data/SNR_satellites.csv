@@ -1,0 +1,48 @@
+﻿platform,satellite,band,Lref,SNR,study
+Sentinel-2,S2A,B1,129,1361,Gascon et al. 2017
+Sentinel-2,S2A,B2,128,214,Gascon et al. 2017
+Sentinel-2,S2A,B3,128,249,Gascon et al. 2017
+Sentinel-2,S2A,B4,108,230,Gascon et al. 2017
+Sentinel-2,S2A,B5,74.5,253,Gascon et al. 2017
+Sentinel-2,S2A,B6,68,220,Gascon et al. 2017
+Sentinel-2,S2A,B7,67,227,Gascon et al. 2017
+Sentinel-2,S2A,B8,103,221,Gascon et al. 2017
+Sentinel-2,S2A,B8A,52.5,161,Gascon et al. 2017
+Sentinel-2,S2A,B9,9,227,Gascon et al. 2017
+Sentinel-2,S2A,B10,6,387,Gascon et al. 2017
+Sentinel-2,S2A,B11,4,158,Gascon et al. 2017
+Sentinel-2,S2A,B12,1.5,166,Gascon et al. 2017
+Sentinel-2,S2A,B1,129,1366,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B2,128,206,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B3,128,235,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B4,108,219,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B5,74.5,243,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B6,68,212,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B7,67,220,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B8,103,213,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B8A,52.5,155,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B9,9,216,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B10,6,383,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B11,4,156,"S2 MSI ESL team, 2025"
+Sentinel-2,S2A,B12,1.7,165,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B1,129,1326,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B2,128,208,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B3,128,236,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B4,108,225,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B5,74.5,242,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B6,68,217,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B7,67,226,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B8,103,225,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B8A,52.5,166,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B9,9,231,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B10,6,394,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B11,4,164,"S2 MSI ESL team, 2025"
+Sentinel-2,S2B,B12,1.7,169,"S2 MSI ESL team, 2025"
+PlanetScope SuperDove,,coastal_blue,4.4418,104.171,"Bahoul et al., 2025"
+PlanetScope SuperDove,,blue,12.07432,85.144,"Bahoul et al., 2025"
+PlanetScope SuperDove,,green_i,10.48304,78.845,"Bahoul et al., 2025"
+PlanetScope SuperDove,,green_ii,10.52977,78.835,"Bahoul et al., 2025"
+PlanetScope SuperDove,,yellow,6.26502,121.671,"Bahoul et al., 2025"
+PlanetScope SuperDove,,red,6.76607,63.016,"Bahoul et al., 2025"
+PlanetScope SuperDove,,red_edge,3.28921,88.109,"Bahoul et al., 2025"
+PlanetScope SuperDove,,nir,2.41192,75.993,"Bahoul et al., 2025"
