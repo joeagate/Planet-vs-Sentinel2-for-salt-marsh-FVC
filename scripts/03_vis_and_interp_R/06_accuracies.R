@@ -20,7 +20,7 @@ onehot <- import_from_dir(
   pattern = '*.csv$',
   import_function = function(x)
     read_csv(x, show_col_types = F),
-  bindrows = T
+  bind_rows = T
 ) %>%
   mutate(onehot = T)
 
@@ -30,7 +30,7 @@ notonehot <- import_from_dir(
   pattern = '*.csv$',
   import_function = function(x)
     read_csv(x, show_col_types = F),
-  bindrows = T
+  bind_rows = T
 ) %>%
   mutate(onehot = F)
 
@@ -87,6 +87,17 @@ cat('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
 # Mean test results
 cat('\nMean test results for the satellites')
 cat('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
+accuracies %>%
+  filter(dataset == 'test') %>%
+  group_by(satellite) %>%
+  summarise(across(MAE:R2, list(
+    mean = mean, sd = sd, n = length
+  ))) %>%
+  ungroup() %>%
+  mutate(across(where(is.numeric), function(x)
+    round(x * 100, 1))) %>%
+  print()
+
 accuracies %>%
   filter(dataset == 'test') %>%
   group_by(satellite, onehot) %>%

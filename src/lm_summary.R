@@ -4,7 +4,7 @@ library(broom)
 annotate_lm <- function(p, x = NULL, y = NULL, slope = F, R2 = T, adjR2 = F, 
                         pv = T, intercept = F, bias = F, xpos = NULL, 
                         ypos = NULL, round_n = 3, hjust = 0, vjust = 1, 
-                        size = 3) {
+                        size = 3, colour = 'black') {
   # Extract mapping from ggplot object if x/y not supplied
   mapping <- p$mapping
   
@@ -47,7 +47,8 @@ annotate_lm <- function(p, x = NULL, y = NULL, slope = F, R2 = T, adjR2 = F,
   
   
   # Add annotation
-  p + annotate("text", x = xpos, y = ypos, label = label, hjust = hjust, vjust = vjust, size = size)
+  p + annotate("text", x = xpos, y = ypos, label = label, hjust = hjust, vjust = vjust, size = size,
+               col = colour)
 }
 
 

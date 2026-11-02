@@ -1,3 +1,6 @@
+# Code to save the figures has been commented out. Remove these comments if you
+# wish to save the figures.
+
 # Set up ------------------------------------------------------------------
 
 # Load packages
@@ -43,7 +46,7 @@ full_cover <- tibble()
 line_plts_list <- list()
 
 # Create named vector for the site long names
-site_long_names <- c('AE' = 'Adur Estuary', 'CP' = 'Cobnor Point', 'AH' = 'Abbotts Hall')
+site_long_names <- c('AE' = 'AE', 'CP' = 'CH', 'AH' = 'BE')
 
 # Init a to 0
 a <- 0
@@ -197,8 +200,8 @@ for (site in c(
     # print(filename)
     path <- glue('{home}/outputs/plots/wider_estuary/per_site/')
     # print(path)
-    ggsave(plt, filename = filename, path = path, dpi = 300,
-           width = 17, height = 8, units = 'cm')
+    # ggsave(plt, filename = filename, path = path, dpi = 300,
+    #        width = 17, height = 8, units = 'cm')
 
     # Add to the list
     hab_class_full[[i]] <- plt
@@ -259,8 +262,8 @@ for (site in c(
     
     # Write the plot to drive
     filename <- glue('{site} new {date}.png')
-    ggsave(plt_new, filename = filename, path = path, dpi = 300,
-           width = 17, height = 8, units = 'cm')
+    # ggsave(plt_new, filename = filename, path = path, dpi = 300,
+    #        width = 17, height = 8, units = 'cm')
     
     # Add to the list
     hab_class_new[[i]] <- plt_new
@@ -324,15 +327,10 @@ for (site in c(
                     aspect_ratio_new,
                     aspect_ratio_new)
     )
-    
-    
-  # ggsave2(map_grid, filename = glue('{site} map comparisons.png'),
-  #         path = './outputs/plots', dpi = 1000, 
-  #         width = 15, height = 20, units = 'cm')
 
-  ggsave2(map_grid, filename = glue('{site} map comparisons.pdf'),
-          path = './outputs/plots/wider_estuary/',
-          width = 19, height = 20, units = 'cm')
+  # ggsave2(map_grid, filename = glue('{site} map comparisons.pdf'),
+  #         path = './outputs/plots/wider_estuary/',
+  #         width = 19, height = 20, units = 'cm')
   beep(10)
 }
 beep(1)
@@ -343,11 +341,11 @@ beep(1)
 line_grid <- plot_grid(plotlist = line_plts_list, ncol = 1, labels = 'auto',
                   label_size = 7)
 
-ggsave(line_grid, filename = 'wider_estuary_extents_lines_1hot.png', 
-       path = './outputs/plots/',
-       dpi = 1000, width = 15, height = 17, units = 'cm')
-
-ggsave(line_grid, filename = 'wider_estuary_extents_lines_1hot.pdf', 
+# ggsave(line_grid, filename = 'wider_estuary_extents_lines_1hot.png', 
+#        path = './outputs/plots/',
+#        dpi = 1000, width = 15, height = 17, units = 'cm')
+# 
+ggsave(line_grid, filename = 'wider_estuary_extents_lines_1hot.pdf',
        path = './outputs/plots/',
        width = 15, height = 17, units = 'cm')
 
@@ -424,36 +422,33 @@ per_pixel_change %>%
 
 
 
-## corr ----
+# Correlation per pixel ---------------------------------------------------
+# Per-pixel correlation for each of the different cover types
 
-cor(per_pixel_change %>%
-      ungroup() %>%
-      select(Unvegetated_change:Mid_change),
-    method = 'pearson', use = 'complete.obs') %>%
-  round(3)
+# Create a df of the different cover combinations
+cover_combinations <- combn(c('Unvegetated_change', 'Low_change', 'Mid_change'), 2) %>%
+  t() %>%
+  as.data.frame() %>%
+  rename(v1 = 1, v2 = 2)
 
-
-for (i in 1:length(sites$site)) {
-  site_i <- sites[['site']][i]
-  area_i <- sites[['Area']][i]
-  cat(site_i, area_i, '\n')
-  
-  dat <- per_pixel_change %>%
-    filter(site == site_i, Area == area_i)
-  
-  cor(dat %>%
-        ungroup() %>%
-        select(Unvegetated_change:Mid_change),
-      method = 'pearson', use = 'complete.obs') %>%
-    round(3) %>%
-    print()
-  cat('\n\n')
+# Loop through the combinations
+for (v1 in cover_combinations$v1){
+  for (v2 in cover_combinations$v2){
+    cat(glue('\n{v1}-{v2}'))
+    cat('\n')
+    cor <- cor.test(per_pixel_change[[v1]], per_pixel_change[[v2]])
+    r <- cor$estimate
+    p <- cor$p.value
+    cat(glue('\nr = {round(r,3)}, p = {scales::scientific(p)}'))
+    cat('\n')
+  }
 }
 
 
-## corr rest vs est ----
+# Correlation rest to est -------------------------------------------------
+# Correlation in mean cover between the restored sites and their 
 
-
+# Calculate mean changes per site
 mean_changes <- full_cover %>%
   group_by(site, Area, Date) %>%
   summarise(across(Unvegetated:Mid, mean)) %>%
@@ -462,6 +457,7 @@ mean_changes <- full_cover %>%
   mutate(across(Unvegetated:Mid, function(x) x = x - lag(x),
                 .names = '{col}_change'))
 
+# Loop through
 
 for (cover in c('Unvegetated', 'Low', 'Mid')) {
   change <- glue('{cover}_change')
@@ -469,20 +465,12 @@ for (cover in c('Unvegetated', 'Low', 'Mid')) {
   for (site_i in c('AE', 'CP', 'AH')) {
     dat <- mean_changes %>%
       filter(site == site_i) %>%
-      select(site:Date, change) %>%
+      select(site:Date, all_of(change)) %>%
       pivot_wider(names_from = Area, values_from = change)
-    cor <- cor(dat$est, dat$new, use = 'complete.obs')
-    print(glue('{site_i} r = {round(cor,3)}'))
+    cor <- cor.test(dat$est, dat$new, use = 'complete.obs')
+    r <- cor$estimate
+    p <- cor$p.value
+    print(glue('{site_i} r = {round(r,3)}, p = {round(p,4)}'))
   }
   
 }
-
-
-amean_changes %>%
-  select(site:Date, 'Unvegetated_change') %>%
-  pivot_wider(names_from = Area, values_from = 'Unvegetated_change') %>%
-  ggplot(aes(est, new)) +
-  geom_point() +
-  coord_equal() +
-  panel_border() +
-  facet_wrap(~ site)

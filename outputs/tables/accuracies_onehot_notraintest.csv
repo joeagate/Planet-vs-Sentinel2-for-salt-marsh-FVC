@@ -1,8 +1,8 @@
 Cover,Satellite,MAE,RMSE,R2
-Unvegetated,Planet,19.9,23.8,41.7
+Unvegetated,Planet,19.9,23.8,41.6
 ,Sentinel,12.1,16.2,72.7
-Low,Planet,19.6,23.9,40.7
-,Sentinel,13.1,16.2,73.4
-Mid,Planet,17.0,21.3,53.8
-,Sentinel,11.7,15.0,76.8
-High,Planet,16.8,20.9,55.8
+Low,Planet,19.6,23.9,40.1
+,Sentinel,13.1,16.2,73.2
+Mid,Planet,17.0,21.3,53.4
+,Sentinel,11.7,15.0,76.6
+High,Planet,16.8,20.9,55.7

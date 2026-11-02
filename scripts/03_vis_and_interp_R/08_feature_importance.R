@@ -6,12 +6,15 @@ library(cowplot)
 library(here)
 library(RColorBrewer)
 library(glue)
+library(tidytext)
+library(colorspace)
 
 # Reset wd
 setwd(here())
 
 # Set plotting theme
 theme_set(theme_cowplot(7))
+theme_update(strip.background = element_blank())
 
 # Source the importing from directories function
 source('src/import_from_dir.R')
@@ -78,6 +81,12 @@ featImp <- featImp %>%
 # Extract the unique model ids
 model_ids <- unique(featImp$model_id)
 
+# Create a named vector of the long names for the cover types
+long_names <- c('unveg' = 'Unvegetated',
+                'low' = 'Low',
+                'mid' = 'Mid',
+                'high' = 'High')
+
 
 # Plot the models --------------------------------------------------------
 
@@ -114,7 +123,7 @@ for (i in model_ids){
                       col = 'grey20', width = .3) +
         coord_flip() +
         labs(x = 'Feature', y = 'Permutation importance') +
-        ggtitle(j) +
+        ggtitle(long_names[j]) +
         theme(legend.position = 'inside',
               legend.position.inside = c(.95,0.05),
               legend.justification.inside = c(1,0)) +
@@ -168,86 +177,99 @@ for (i in model_ids){
   }
   
   # Combine the plots into a grid
-  grid <- plot_grid(plotlist = plot_list, labels = 'AUTO', label_size = 8,
+  grid <- plot_grid(plotlist = plot_list, labels = 'AUTO', label_size = 7,
                     ncol = 2, nrow = 2)
   
   # Save the grid to drive
-  ggsave2(grid, filename = paste0(i, '.png'), path = 'outputs/plots/feature_importance/',
+  ggsave2(grid, filename = paste0(i, '.pdf'), path = 'outputs/plots/feature_importance/',
           dpi = 500, width = 15, height = 17, units = 'cm')
   
-  total_grid <- plot_grid(plotlist = total_list, labels = 'AUTO', label_size = 8,
+  total_grid <- plot_grid(plotlist = total_list, labels = 'AUTO', label_size = 7,
                     ncol = 2, nrow = 2)
   
   # Save the grid to drive
-  ggsave2(total_grid, filename = paste0(i, '_total.png'), path = 'outputs/plots/feature_importance/total',
+  ggsave2(total_grid, filename = paste0(i, '_total.pdf'), path = 'outputs/plots/feature_importance/total',
           dpi = 500, width = 15, height = 12, units = 'cm')
-}
-
-# Train-test --------------------------------------------------------------
-
-for (sat in c('Planet', 'Sentinel')) {
-  print(sat)
-  
-  # Filter to the satellite
-  featImp_sat <- featImp %>%
-    filter(Satellite == sat)
-  
-  # Init a list to store the plots
-  plt_list <- list()
-  a <- 0
-  
-  # Loop through the cover types
-  # %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  for (cover in c('Unvegetated', 'Low', 'Mid', 'High')) {
-    print(cover)
-    
-    # Filter to the model
-    featImp_sat_cover <- featImp_sat %>%
-      filter(Cover_type == cover)
-    
-    # Check first there is data for the model
-    if (length(featImp_sat_cover$feature)>0){
-      a <- a+1
-      
-      
-      
-      # Plot the perm importance with train and test
-      plt <- featImp_sat_cover %>%
-        ggplot(aes(reorder(feature, mean_perm_importance), 
-                   mean_perm_importance, fill = Dataset)) +
-        geom_col(position = position_dodge(width = .7), width = .7) +
-        geom_errorbar(aes(ymin = mean_perm_importance-std_dev_perm_importance,
-                          ymax = mean_perm_importance+std_dev_perm_importance),
-                      position = position_dodge(width = .7), width = .4) +
-        coord_flip() +
-        labs(y = 'Permutation importance', x = 'Features') +
-        scale_y_continuous(expand = expansion(c(.01, .05))) +
-        scale_fill_brewer(palette = 'Set2', breaks = c('Train', 'Test')) +
-        theme(legend.position = 'inside',
-              legend.position.inside = c(.95,.05),
-              legend.justification.inside = c(1,0)) +
-        ggtitle(cover)
-      
-      # Save the plot to the list
-      plt_list[[a]] <- plt
-      
-    } else {warning(glue('Cover type {cover} for {sat} has length 0, so not plotted'))}
-    
-  }
-  
-  # Plot the grid
-  grd <- plot_grid(plotlist = plt_list, labels = 'AUTO', label_size = 8)
-  
-  # Save the grid to drive
-  ggsave2(grd, filename = glue('{sat} train test featImp grid.png'),
-          path = 'Upscaling/Plots/Feature importance/Publication/Train-Test/',
-          dpi = 1000, width = 15, height = 17, units = 'cm')
 }
 
 
 # Ranking -----------------------------------------------------------------
 
 ## Mean importance ----
+
+# Mean importance for feature groups
+featImp %>%
+  filter(dataset == 'test') %>%
+  filter(onehot == 'onehot') %>%
+  group_by(feature_group) %>%
+  summarise(mean_perm = mean(mean_perm_importance),
+            sd = sd(mean_perm_importance),
+            n = n()) %>%
+  arrange(desc(mean_perm))
+
+# Mean importance for feature groups per satellite
+featImp %>%
+  filter(dataset == 'test') %>%
+  filter(onehot == 'onehot') %>%
+  group_by(feature_group, satellite) %>%
+  summarise(mean_perm = mean(mean_perm_importance),
+            sd = sd(mean_perm_importance),
+            n = n()) %>%
+  arrange(desc(mean_perm)) %>%
+  split(f = .$satellite)
+
+# Mean importance for feature groups per cover per satellite
+featImp %>%
+  filter(dataset == 'test') %>%
+  filter(onehot == 'onehot') %>%
+  group_by(feature_group, cover, satellite) %>%
+  summarise(mean_perm = mean(mean_perm_importance),
+            sd = sd(mean_perm_importance),
+            n = n()) %>%
+  arrange(desc(mean_perm)) %>%
+  mutate(sat_cover = interaction(satellite, cover)) %>%
+  select(-satellite, cover) %>%
+  split(f = .$sat_cover)
+
+# Mean importance for feature groups per cover
+featImp %>%
+  filter(dataset == 'test') %>%
+  filter(onehot == 'onehot') %>%
+  group_by(feature_group, cover) %>%
+  summarise(mean_perm = mean(mean_perm_importance),
+            sd = sd(mean_perm_importance),
+            n = n()) %>%
+  arrange(desc(mean_perm)) %>%
+  split(f = .$cover)
+
+# Plot the relative importance of the features
+featImp %>%
+  filter(dataset == 'test') %>%
+  filter(onehot == 'onehot') %>%
+  group_by(feature_group, cover, satellite) %>%
+  summarise(mean_perm = mean(mean_perm_importance),
+            sd = sd(mean_perm_importance),
+            n = n()) %>%
+  mutate(mod = paste(cover, satellite)) %>%
+  ggplot(aes(reorder_within(feature_group, mean_perm, mod), mean_perm)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = mean_perm-sd, ymax = mean_perm+sd),
+                width = .2) +
+  coord_flip() +
+  facet_wrap(~mod, scales = 'free_y') +
+  panel_border() +
+  scale_x_reordered() +
+  theme(strip.background = element_blank())
+
+featImp %>%
+  filter(dataset == 'test') %>%
+  group_by(model_id, feature_group) %>%
+  summarise(sum_perm = sum(mean_perm_importance)) %>%
+  group_by(feature_group) %>%
+  summarise(mean_sum_perm = mean(sum_perm),
+            sd = sd(sum_perm),
+            n = n())
+
 
 featImp %>%
   filter(feature != 'DTM') %>%
@@ -257,100 +279,29 @@ featImp %>%
   coord_flip() +
   labs(x = NULL) 
 
-## Ranked ----
 
-ranked <- featImp %>%
-  filter(Dataset == 'Test') %>%
-  group_by(Satellite, Sample, Cover_type, Bands) %>%
-  arrange(desc(mean_perm_importance), .by_group = T) %>%
-  mutate(Rank = 1:n()) %>%
-  ungroup()
+
+# Train-test --------------------------------------------------------------
 
 featImp %>%
-  filter(Satellite == 'Sentinel', Dataset == 'Test', Cover_type == 'Mid', NIR == 'B8A') %>%
-  print(n = Inf)
-
-ranked %>%
-  group_by(feature, Rank) %>%
-  count() %>%
-  ungroup() %>%
-  filter(Rank < 5) %>%
-  arrange(Rank, desc(n)) %>%
-  split(f = .$Rank)
-
-ranked %>%
-  mutate(Rank_bin = cut_interval(Rank, length = 5)) %>%
-  group_by(feature, Rank_bin) %>%
-  count() %>%
-  arrange(Rank_bin, desc(n)) %>%
-  split(f = .$Rank_bin)
-
-ranked %>%
-  filter(feature_group == 'VIs') %>%
-  ggplot(aes(reorder(feature, desc(Rank)), Rank, col = feature_group)) +
-  # geom_boxplot() +
-  geom_point() +
+  filter(onehot == 'onehot') %>%
+  select(feature, mean_perm_importance, satellite, cover, dataset, onehot) %>%
+  pivot_wider(names_from = dataset,
+              values_from = mean_perm_importance) %>%
+  mutate(test_train_diff = test - train,
+         pcnt_test_train_diff = test_train_diff / train) %>%
+  mutate(mod = paste(satellite, cover)) %>%
+  ggplot(aes(reorder_within(feature, test_train_diff, mod), test_train_diff)) +
+  geom_col(aes(fill = test_train_diff), show.legend = F) +
   coord_flip() +
-  scale_color_brewer(palette = 'Dark2')
-
-
-## Grouping ----
-
-featImp %>%
-  filter(feature != 'DTM') %>%
-  ggplot(aes(reorder(feature_group, mean_perm_importance), mean_perm_importance)) +
-  geom_boxplot() +
-  coord_flip() +
-  labs(x = NULL)
-
-
-featImp %>%
-  filter(feature != 'DTM') %>%
-  # filter(feature_group == 'Site') %>%
-  mutate(Cover_type = factor(Cover_type, levels = c('Unvegetated', 'Low', 'Mid', 'High'))) %>%
-  # filter(mean_perm_importance < 0.004) %>%
-  ggplot(aes(reorder(feature, mean_perm_importance), mean_perm_importance)) +
-  geom_hline(yintercept = 0, col = 'grey', linetype = 2) +
-  geom_boxplot() +
-  geom_point(aes(col = paste(Satellite, Sample))) +
-  coord_flip() +
-  labs(x = NULL, col = NULL) +
-  facet_grid(rows = vars(feature_group), cols = vars(Cover_type),
-             scales = 'free', space = 'free') +
+  facet_wrap(~ satellite + cover, scales = 'free') +
   panel_border() +
-  theme(strip.background = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
-
-ranked %>%
-  filter(feature != 'DTM') %>%
-  ggplot(aes(reorder(feature, desc(Rank)), Rank)) +
-  geom_boxplot() +
-  coord_flip() +
-  labs(x = NULL) +
-  facet_grid(rows = vars(feature_group), cols = vars(Cover_type),
-             scales = 'free', space = 'free') +
-  panel_border()
-
-
-featImp %>% 
-  group_by(feature) %>%
-  summarise(mean_perm_importance = mean(mean_perm_importance)) %>%
-  arrange(mean_perm_importance)
-
-
+  scale_x_reordered() +
+  scale_fill_continuous_divergingx(mid = 0, palette = 'Geyser',
+                                   rev = T)
 
 
 featImp %>%
-  filter(Cover_type == 'Low') %>%
-  ggplot(aes(reorder(feature, mean_perm_importance), 
-             mean_perm_importance, fill = Dataset)) +
-  geom_col(position = position_dodge(width = .7), width = .7) +
-  geom_errorbar(aes(ymin = mean_perm_importance-std_dev_perm_importance,
-                    ymax = mean_perm_importance+std_dev_perm_importance),
-                position = position_dodge(width = .7), width = .4) +
-  coord_flip() +
-  labs(y = 'Permutation importance', x = 'Features') +
-  scale_y_continuous(expand = expansion(c(.01, .05))) +
-  scale_fill_brewer(palette = 'Set2') +
-  theme(legend.position = 'inside',
-        legend.position.inside = c(.95,.05),
-        legend.justification.inside = c(1,0))
+  filter(dataset == 'train') %>%
+  group_by(satellite, feature_group) %>%
+  summarise(mean_perm = mean(mean_perm_importance))

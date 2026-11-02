@@ -4,7 +4,6 @@
 library(terra)
 library(tidyverse)
 library(here)
-library(beepr)
 library(tidyterra)
 
 # Reset working directory
@@ -266,11 +265,11 @@ for (i in names(s2_images)){
   # Append to the larger data frame
   est_full <- bind_rows(est_full, Values)
   
-  beep(10)
+  # beep(10)
   
 }
 
-beep(1)
+# beep(1)
 
 # New loop ----------------------------------------------------------------
 
@@ -461,11 +460,11 @@ for (i in names(s2_images)){
   # Append to the larger data frame
   new_full <- bind_rows(new_full, Values)
   
-  beep(10)
+  # beep(10)
   
 }
 
-beep(1)
+# beep(1)
 
 
 # Wrangling ---------------------------------------------------------------
