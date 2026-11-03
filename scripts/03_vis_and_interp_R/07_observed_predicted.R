@@ -10,7 +10,7 @@ library(Metrics)
 setwd(here())
 
 # Set plotting theme
-theme_set(theme_cowplot(12))
+theme_set(theme_cowplot(7))
 
 # Source the importing from directories function
 source('src/import_from_dir.R')
@@ -114,7 +114,7 @@ for (i in ModelIDs){
       
       # Annotate the plot
       plot <- annotate_lm(plot, slope = T, intercept = F,
-                          R2 = T, adjR2 = F, size = 3, pv = F, bias = T,
+                          R2 = T, adjR2 = F, size = 2, pv = F, bias = T,
                           xpos = 0, ypos = 100)
       
       plot_list[[a]] <- plot
