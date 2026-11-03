@@ -1,7 +1,10 @@
 # Comparison of Planet and Sentinel-2 for the fractional vegetation cover of coastal wetland communities
 
 <p align="center">
-<img src="imgs/Sat upscaling FVC diagram.jpeg" width="400"/>
+    <img src="imgs/Sat upscaling FVC diagram.jpeg" width="400"/>
+</p>
+<p align="center">
+    <em>Schematic of the training workflow</em>
 </p>
 
 
