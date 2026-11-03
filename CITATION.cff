@@ -13,6 +13,9 @@ authors:
     email: j.e.agate@utwente.nl
     affiliation: University of Twente
     orcid: 'https://orcid.org/0000-0003-2080-5802'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23911813
 repository-code: >-
   https://github.com/joeagate/Planet-vs-Sentinel2-for-salt-marsh-FVC
 license: MIT
