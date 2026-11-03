@@ -8,7 +8,6 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - {}
   - given-names: Joseph
     family-names: Agate
     email: j.e.agate@utwente.nl
